@@ -16,6 +16,7 @@ private:
 public:
 	void setDefinition(vector<string>);
 	void setParameters(vector<string>);
+	void setParameters(string);
     double call(vector<double> parameters);
 
 };

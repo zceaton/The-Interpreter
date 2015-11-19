@@ -70,8 +70,19 @@ void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
 			for (int x = space + 1; lineFromFile[x] != '('; x++) {
 				functionName += lineFromFile[x];
 			}
-
 			cout << "THE FUNCTION NAME IS: " << functionName << endl;
+
+			for (int x = leftParenth + 1; lineFromFile[x] != ')'; x++) {
+				parameterList += lineFromFile[x];
+			}
+			cout << "PARAMETER LIST STRING: " << parameterList << endl;
+
+			if (parameterList.find_first_of(',') == -1) {
+				uf.setParameters(parameterList);
+			}
+			else {
+				uf.setParameters(tokenize(parameterList, ","));
+			}
 
 			getline(inputFile, lineFromFile);
 			while (getLineType(lineFromFile) != END_BLOCK) {
@@ -81,13 +92,7 @@ void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
 
 			uf.setDefinition(definition);
 
-			for (int x = leftParenth + 1; lineFromFile[x] != ')'; x++) {
-				parameterList += lineFromFile[x];
-			}
-
-			uf.setParameters(tokenize(parameterList, ","));
 			functionMap[functionName] = uf;
-
 			break;
 
 		case(RETURN) :

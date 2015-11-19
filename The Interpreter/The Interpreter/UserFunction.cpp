@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 
-void UserFunction::setDefinition(vector<string> definition_){
+void UserFunction::setDefinition(vector<string> definition_) {
 	definition = definition_;
 	cout << "THE DEFINITION:" << endl;
 	for (int x = 0; x < definition.size(); x++) {
@@ -10,15 +10,18 @@ void UserFunction::setDefinition(vector<string> definition_){
 	}
 }
 
-void UserFunction::setParameters(vector<string> parameters_){
+void UserFunction::setParameters(vector<string> parameters_) {
 	parameters = parameters_;
-	/*cout << "THE PARAMETER LIST: " << endl;
-	if (parameters.size() != 0) {
-		for (int x = 0; x < definition.size(); x++) {
-			cout << parameters[x] << ",";
-		}
-		cout << endl;
-	}*/
+	cout << "THE PARAMETER LIST: " << endl;
+	for (int x = 0; x < parameters.size(); x++) {
+		cout << parameters[x] << endl;
+	}
+}
+
+void UserFunction::setParameters(string s) {
+	parameters.push_back(s);
+	cout << "THE PARAMETER LIST: " << endl;
+	cout << parameters[0] << endl;
 }
 
 double UserFunction::call(vector<double> parameters) {

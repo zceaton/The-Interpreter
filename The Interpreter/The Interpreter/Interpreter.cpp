@@ -4,10 +4,11 @@
 void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
 
 	string lineFromFile, temp = "", right = "", left = "";
-	int lineNumber = 0, space;
-	vector<string> tokenizedLine, splitLine;
-	string variableName, toPrint, functionName;
+	int lineNumber = 0, space, leftParenth;
+	vector<string> tokenizedLine, splitLine, definition;
+	string variableName, toPrint, functionName, parameterList;
 	double variableValue;
+	UserFunction uf;
 
 	while (getline(inputFile, lineFromFile)) {
 		lineNumber++;
@@ -63,18 +64,37 @@ void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
 
 		case(FUNCTION_DEF) :
 			space = lineFromFile.find_first_of(' ');
+			leftParenth = lineFromFile.find_first_of('(');
 			functionName = "";
+
 			for (int x = space + 1; lineFromFile[x] != '('; x++) {
 				functionName += lineFromFile[x];
 			}
-			cout << functionName << endl;
-			functionMap[functionName];
+
+			cout << "THE FUNCTION NAME IS: " << functionName << endl;
+
+			getline(inputFile, lineFromFile);
+			while (getLineType(lineFromFile) != END_BLOCK) {
+				definition.push_back(lineFromFile);
+				getline(inputFile, lineFromFile);
+			}
+
+			uf.setDefinition(definition);
+
+			for (int x = leftParenth + 1; lineFromFile[x] != ')'; x++) {
+				parameterList += lineFromFile[x];
+			}
+
+			uf.setParameters(tokenize(parameterList, ","));
+			functionMap[functionName] = uf;
+
 			break;
 
 		case(RETURN) :
 			break;
 
 		case(END_BLOCK) :
+			//do nothing
 			break;
 
 		case(IF) :

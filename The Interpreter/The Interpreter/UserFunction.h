@@ -14,7 +14,8 @@ private:
     vector<string> definition, parameters;
 
 public:
-	UserFunction(vector<string>, vector<string>);
+	void setDefinition(vector<string>);
+	void setParameters(vector<string>);
     double call(vector<double> parameters);
 
 };

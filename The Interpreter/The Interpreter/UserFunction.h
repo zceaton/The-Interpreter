@@ -1,3 +1,4 @@
+//Change some stuff
 #ifndef CSE250_FALL2015_USERFUNCTION_H
 #define CSE250_FALL2015_USERFUNCTION_H
 

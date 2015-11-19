@@ -4,9 +4,9 @@
 void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
 
 	string lineFromFile, temp = "", right = "", left = "";
-	int lineNumber = 0;
+	int lineNumber = 0, space;
 	vector<string> tokenizedLine, splitLine;
-	string variableName, toPrint;
+	string variableName, toPrint, functionName;
 	double variableValue;
 
 	while (getline(inputFile, lineFromFile)) {
@@ -62,8 +62,8 @@ void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
 			break;
 
 		case(FUNCTION_DEF) :
-			int space = lineFromFile.find_first_of(' ');
-			string functionName = "";
+			space = lineFromFile.find_first_of(' ');
+			functionName = "";
 			for (int x = space + 1; lineFromFile[x] != '('; x++) {
 				functionName += lineFromFile[x];
 			}

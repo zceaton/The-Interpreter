@@ -6,4 +6,6 @@ UserFunction::UserFunction(vector<string> parameters_, vector<string> definition
 	definition = definition_;
 }
 
-double
+double UserFunction::call(vector<double> parameters) {
+
+}

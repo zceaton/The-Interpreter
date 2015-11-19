@@ -24,6 +24,7 @@ void UserFunction::setParameters(string s) {
 	cout << parameters[0] << endl;
 }
 
-double UserFunction::call(vector<double> parameters) {
-
+double UserFunction::call(/*vector<double> parameters*/) {
+	cout << "CALLED" << endl;
+	return 0.0;
 }

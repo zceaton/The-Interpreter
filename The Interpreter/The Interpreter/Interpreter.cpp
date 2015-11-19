@@ -13,6 +13,8 @@ void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
 	while (getline(inputFile, lineFromFile)) {
 		lineNumber++;
 		toPrint = "";
+		functionName = "";
+		parameterList = "";
 		LINE_TYPE lineType = getLineType(lineFromFile); // Check Parser.h for the different line types
 		cout << "line " << lineNumber << " is type: " << lineType << endl;
 		cout << lineFromFile << " | ";
@@ -37,10 +39,20 @@ void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
 			break;
 
 		case(USER_DEFINED) :
-			splitLine = tokenize(lineFromFile, "=");
-			right = splitLine[1];
-			if (right[0] == ' ') { right = right.substr(1); }
-			variableMap[tokenizedLine[0]] = computeInfix(right);
+			if (lineFromFile.find_first_of('=') != -1) {
+				splitLine = tokenize(lineFromFile, "=");
+				right = splitLine[1];
+				if (right[0] == ' ') { right = right.substr(1); }
+				variableMap[tokenizedLine[0]] = computeInfix(right);
+			}
+			else {
+				for (int x = 0; lineFromFile[x] != '('; x++) {
+					functionName += lineFromFile[x];
+				}
+
+				cout << "Function being called: " << functionName << endl;
+				functionMap[functionName].call();
+			}
 			break;
 
 		case(DOC_WRITE) :

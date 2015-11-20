@@ -16,6 +16,7 @@ private:
 
 public:
 	void setDefinition(vector<string>);
+	vector<string> getDefinition();
 	void setParameters(vector<string>);
 	void setParameters(string);
 	double call(ofstream & outputFile);

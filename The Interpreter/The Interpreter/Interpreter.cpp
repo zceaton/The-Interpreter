@@ -4,12 +4,10 @@
 string lineFromFile, temp = "", rightSide = "", left = "";
 int lineNumber = 0, space, leftParenth;
 vector<string> tokenizedLine, splitLine, definition;
-string variableName, toPrint, functionName, parameterList, lineOfDefinition;
+string variableName, toPrint, functionName, parameterList;
 double variableValue;
-ifstream inputFile;
-ofstream outputFile;
 
-void Interpreter::interpretScript(ifstream& inputFile_, ofstream& outputFile_) {
+void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
 	while (getline(inputFile, lineFromFile)) {
 		interpretLine(lineFromFile, inputFile, outputFile);
 	}
@@ -302,11 +300,9 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 			}
 
 			cout << "Function being called: " << functionName << endl;
-			//functionMap[functionName].call(outputFile);
-
+			functionMap[functionName].call(outputFile);
 			for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {
-				lineOfDefinition = functionMap[functionName].getDefinition()[x];
-				evaluateFunction(lineOfDefinition, inputFile, outputFile);
+
 			}
 		}
 		break;
@@ -381,38 +377,30 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 	}
 }
 
-double Interpreter::evaluateFunction(string lineOfDefinition, ifstream& inputFile_, ofstream& outputFile_) {
-	int d = 0;
-	cout << "CALLED" << endl;
-	for (int x = 0; x < definition.size(); x++) {
-		string toPrint = "";
+double Interpreter::evaluateFunction(string line, ofstream& outputFile) {
 
-		switch (getLineType(definition[x])) {
-		case(BLANK_LINE) :
-			//do nothing for blank line
-			break;
+	switch (getLineType(line)) {
+	case(BLANK_LINE) :
+		//do nothing for blank line
+		break;
 
-		case(DOC_WRITE) :
-			d = definition[x].find_first_of('d');
-			definition[x] = definition[x].substr(d);
-			if (definition[x][15] == '"') {
-				for (int y = 16; y < definition[x].length() - 2; y++) {
-					toPrint += definition[x][y];
-				}
-				outputFile << toPrint;
+	case(DOC_WRITE) :
+		if (line[15] == '"') {
+			for (int x = 16; x < line.length() - 3; x++) {
+				toPrint += line[x];
 			}
-			else {
-				int y = 15;
-				while (definition[x][y] != ')') {
-					toPrint += definition[x][y];
-					x++;
-				}
-				cout << toPrint << endl;
-				//outputFile << variableMap[toPrint];
-			}
-
-			break;
+			outputFile << toPrint;
 		}
+		else {
+			int x = 15;
+			while (line[x] != ')') {
+				toPrint += line[x];
+				x++;
+			}
+			cout << toPrint << endl;
+			outputFile << variableMap[toPrint];
+		}
+
+		break;
 	}
-	return 0.0;
 }

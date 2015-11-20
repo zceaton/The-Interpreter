@@ -10,6 +10,10 @@ void UserFunction::setDefinition(vector<string> definition_) {
 	}
 }
 
+vector<string> UserFunction::getDefinition() {
+	return definition;
+}
+
 void UserFunction::setParameters(vector<string> parameters_) {
 	parameters = parameters_;
 	cout << "THE PARAMETER LIST: " << endl;
@@ -22,10 +26,6 @@ void UserFunction::setParameters(string s) {
 	parameters.push_back(s);
 	cout << "THE PARAMETER LIST: " << endl;
 	cout << parameters[0] << endl;
-}
-
-vector<string> UserFunction::getDefinition() {
-	return definition;
 }
 
 double UserFunction::call(/*vector<double> parameters*/ofstream& outputFile) {

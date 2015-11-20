@@ -14,16 +14,18 @@ class UserFunction {
 
 private:
 	vector<string> definition;
-	map<int, pair<string, double>> parameters;
+	map<int, string> parameters;
+	map<int, pair<string, double>> arguments;
 
 public:
 	void setDefinition(vector<string>);
 	vector<string> getDefinition();
 	void setParameters(vector<string>);
 	void setParameters(string);
+	void setArguments(vector<string> arguments_);
 	void setArguments(vector<double> arguments_);
-	double call(ofstream & outputFile);
-	double call(/*vector<double> parameters*/);
+	map<int, pair<string, double>> getArguments();
+	map<int, string> getParameters();
 	void setReturnValue(double);
 	double getReturnValue();
 	int returnValue;

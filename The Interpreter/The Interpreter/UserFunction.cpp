@@ -16,54 +16,32 @@ vector<string> UserFunction::getDefinition() {
 
 void UserFunction::setParameters(vector<string> parameters_) {
 	for (int x = 0; x < parameters_.size(); x++) {
-		parameters[x].first = parameters_[x];
+		parameters[x] = parameters_[x];
 	}
 }
 
 void UserFunction::setParameters(string s) {
-	parameters[0].first = s;
+	parameters[0] = s;
+}
+
+void UserFunction::setArguments(vector<string> arguments_) {
+	for (int x = 0; x < arguments_.size(); x++) {
+		arguments[x].first = arguments_[x];
+	}
 }
 
 void UserFunction::setArguments(vector<double> arguments_) {
 	for (int x = 0; x < arguments_.size(); x++) {
-		parameters[x].second = arguments_[x];
+		arguments[x].second = arguments_[x];
 	}
 }
 
-double UserFunction::call(/*vector<double> parameters, ofstream& outputFile*/) {
-	/*int d = 0;
-	cout << "CALLED" << endl;
-	for (int x = 0; x < definition.size(); x++) {
-		string toPrint = "";
+map<int, pair<string, double>> UserFunction::getArguments() {
+	return arguments;
+}
 
-		switch (getLineType(definition[x])) {
-		case(BLANK_LINE) :
-			//do nothing for blank line
-			break;
-
-		case(DOC_WRITE) :
-			d = definition[x].find_first_of('d');
-			definition[x] = definition[x].substr(d);
-			if (definition[x][15] == '"') {
-				for (int y = 16; y < definition[x].length() - 2; y++) {
-					toPrint += definition[x][y];
-				}
-				outputFile << toPrint;
-			}
-			else {
-				int y = 15;
-				while (definition[x][y] != ')') {
-					toPrint += definition[x][y];
-					x++;
-				}
-				cout << toPrint << endl;
-				//outputFile << variableMap[toPrint];
-			}
-
-			break;
-		}
-	}*/
-	return returnValue;
+map<int, string> UserFunction::getParameters() {
+	return parameters;
 }
 
 void UserFunction::setReturnValue(double d){

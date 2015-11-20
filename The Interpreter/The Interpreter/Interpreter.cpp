@@ -423,7 +423,7 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 			variableMap[tokenizedLine1[0]] = computeInfix(rightSide1);
 		}
 
-		break;
+					   break;
 
 	case(DOC_WRITE) :
 		if (line[15] == '"') {

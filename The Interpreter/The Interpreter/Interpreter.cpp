@@ -2,7 +2,7 @@
 #include <stack>
 
 string lineFromFile, temp = "", rightSide = "", left = "";
-int lineNumber = 0, space, leftParenth;
+int lineNumber = 0, space, leftParenth, d;
 vector<string> tokenizedLine, splitLine, definition;
 string variableName, toPrint, functionName, parameterList;
 double variableValue;
@@ -300,9 +300,9 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 			}
 
 			cout << "Function being called: " << functionName << endl;
-			functionMap[functionName].call(outputFile);
+			//functionMap[functionName].call(outputFile);
 			for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {
-
+				evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile);
 			}
 		}
 		break;
@@ -377,7 +377,9 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 	}
 }
 
-double Interpreter::evaluateFunction(string line, ofstream& outputFile) {
+double Interpreter::evaluateFunction(string s, ofstream& outputFile) {
+	string line = s;
+	toPrint = "";
 
 	switch (getLineType(line)) {
 	case(BLANK_LINE) :
@@ -385,8 +387,10 @@ double Interpreter::evaluateFunction(string line, ofstream& outputFile) {
 		break;
 
 	case(DOC_WRITE) :
+		d = line.find_first_of('d');
+		line = line.substr(d);
 		if (line[15] == '"') {
-			for (int x = 16; x < line.length() - 3; x++) {
+			for (int x = 16; x < line.length() - 2; x++) {
 				toPrint += line[x];
 			}
 			outputFile << toPrint;

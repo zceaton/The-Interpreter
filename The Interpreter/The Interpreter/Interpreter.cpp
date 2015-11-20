@@ -309,7 +309,7 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 
 	case(DOC_WRITE) :
 		if (lineFromFile[15] == '"') {
-			for (int x = 16; x < lineFromFile.length() - 3; x++) {
+			for (int x = 16; x < lineFromFile.length() - 2; x++) {
 				toPrint += lineFromFile[x];
 			}
 			outputFile << toPrint;
@@ -380,15 +380,31 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 double Interpreter::evaluateFunction(string s, ofstream& outputFile) {
 	string line = s;
 	toPrint = "";
+	d = line.find_first_not_of(' ');
+	line = line.substr(d);
+	tokenizedLine = tokenize(line, " ");
+	cout << "The line type is: " << getLineType(line) << endl;
 
 	switch (getLineType(line)) {
 	case(BLANK_LINE) :
 		//do nothing for blank line
 		break;
 
+	case(DEFINE_VAR) :
+		if (tokenizedLine.size() == 4) {
+			cout << "CASE A:" << endl;
+			variableMap[tokenizedLine[1]] = stod(tokenizedLine[3]);
+		}
+		else {
+			cout << "CASE B:" << endl;
+			splitLine = tokenize(lineFromFile, "=");
+			rightSide = splitLine[1];
+			variableMap[tokenizedLine[1]] = computeInfix(rightSide);
+		}
+		cout << "THE VARIABLE WAS INSERTED. ITS VALUE IS: " << variableMap[tokenizedLine[1]] << endl;
+		break;
+
 	case(DOC_WRITE) :
-		d = line.find_first_of('d');
-		line = line.substr(d);
 		if (line[15] == '"') {
 			for (int x = 16; x < line.length() - 2; x++) {
 				toPrint += line[x];

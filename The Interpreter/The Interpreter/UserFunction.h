@@ -1,4 +1,3 @@
-//Change some stuff
 #ifndef CSE250_FALL2015_USERFUNCTION_H
 #define CSE250_FALL2015_USERFUNCTION_H
 
@@ -24,4 +23,3 @@ public:
 };
 
 #endif //CSE250_FALL2015_USERFUNCTION_H
-//change some other stuff

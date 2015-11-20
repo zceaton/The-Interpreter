@@ -4,11 +4,13 @@
 string lineFromFile, temp = "", rightSide = "", left = "";
 int lineNumber = 0, space, leftParenth;
 vector<string> tokenizedLine, splitLine, definition;
-string variableName, toPrint, functionName, parameterList;
+string variableName, toPrint, functionName, parameterList, lineOfDefinition;
 double variableValue;
+ifstream inputFile;
+ofstream outputFile;
 
-void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
-		while (getline(inputFile, lineFromFile)) {
+void Interpreter::interpretScript(ifstream& inputFile_, ofstream& outputFile_) {
+	while (getline(inputFile, lineFromFile)) {
 		interpretLine(lineFromFile, inputFile, outputFile);
 	}
 	// write the result from the return statement of the program into the output file
@@ -300,7 +302,12 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 			}
 
 			cout << "Function being called: " << functionName << endl;
-			functionMap[functionName].call(outputFile);
+			//functionMap[functionName].call(outputFile);
+
+			for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {
+				lineOfDefinition = functionMap[functionName].getDefinition()[x];
+				evaluateFunction(lineOfDefinition, inputFile, outputFile);
+			}
 		}
 		break;
 
@@ -372,4 +379,40 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 	case(ELSE) :
 		break;
 	}
+}
+
+double Interpreter::evaluateFunction(string lineOfDefinition, ifstream& inputFile_, ofstream& outputFile_) {
+	int d = 0;
+	cout << "CALLED" << endl;
+	for (int x = 0; x < definition.size(); x++) {
+		string toPrint = "";
+
+		switch (getLineType(definition[x])) {
+		case(BLANK_LINE) :
+			//do nothing for blank line
+			break;
+
+		case(DOC_WRITE) :
+			d = definition[x].find_first_of('d');
+			definition[x] = definition[x].substr(d);
+			if (definition[x][15] == '"') {
+				for (int y = 16; y < definition[x].length() - 2; y++) {
+					toPrint += definition[x][y];
+				}
+				outputFile << toPrint;
+			}
+			else {
+				int y = 15;
+				while (definition[x][y] != ')') {
+					toPrint += definition[x][y];
+					x++;
+				}
+				cout << toPrint << endl;
+				//outputFile << variableMap[toPrint];
+			}
+
+			break;
+		}
+	}
+	return 0.0;
 }

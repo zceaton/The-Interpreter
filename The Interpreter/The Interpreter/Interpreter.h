@@ -44,6 +44,7 @@ public:
 	vector<string> infixToPostfix(string infixExpression);
 	string correctSpacing(string original);
 	void interpretLine(string s, ifstream & inputFile, ofstream & outputFile);
+	double evaluateFunction(string lineOfDefinition, ifstream & inputFile_, ofstream & outputFile_);
 	/*CHAR_TYPE getCharType(string s);
 	OPERATOR_TYPE getOperatorType(string s);*/
 };

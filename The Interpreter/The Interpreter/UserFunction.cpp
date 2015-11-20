@@ -24,6 +24,10 @@ void UserFunction::setParameters(string s) {
 	cout << parameters[0] << endl;
 }
 
+vector<string> UserFunction::getDefinition() {
+	return definition;
+}
+
 double UserFunction::call(/*vector<double> parameters*/ofstream& outputFile) {
 	int d = 0;
 	cout << "CALLED" << endl;

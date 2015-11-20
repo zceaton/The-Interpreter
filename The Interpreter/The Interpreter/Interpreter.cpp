@@ -416,14 +416,12 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 		break;
 
 	case(USER_DEFINED) :
+		if (lineFromFile.find_first_of('=') != -1) {
 			splitLine1 = tokenize(line, "=");
 			rightSide1 = splitLine1[1];
 			if (rightSide1[0] == ' ') { rightSide1 = rightSide1.substr(1); }
-			cout << "THE LEFT SIDE: " << tokenizedLine1[0] << endl;
-			cout << "THE RIGHT SIDE: " << rightSide1 << endl;
-			cout << "THE RESULT OF RIGHT SIDE CALCULATION: " << computeInfix(rightSide1) << endl;
 			variableMap[tokenizedLine1[0]] = computeInfix(rightSide1);
-			cout << "THE VALUE OF THE LEFT SIDE: " << variableMap[tokenizedLine1[0]] << endl;
+		}
 
 		break;
 

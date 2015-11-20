@@ -5,6 +5,7 @@
 #include <string>
 #include "Parser.h"
 #include <fstream>
+#include <map>
 
 using namespace std;
 
@@ -12,13 +13,15 @@ using namespace std;
 class UserFunction {
 
 private:
-	vector<string> definition, parameters;
+	vector<string> definition;
+	map<int, pair<string, double>> parameters;
 
 public:
 	void setDefinition(vector<string>);
 	vector<string> getDefinition();
 	void setParameters(vector<string>);
 	void setParameters(string);
+	void setArguments(vector<double> arguments_);
 	double call(ofstream & outputFile);
 	double call(/*vector<double> parameters*/);
 	void setReturnValue(double);

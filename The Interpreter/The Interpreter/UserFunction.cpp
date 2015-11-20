@@ -15,17 +15,19 @@ vector<string> UserFunction::getDefinition() {
 }
 
 void UserFunction::setParameters(vector<string> parameters_) {
-	parameters = parameters_;
-	cout << "THE PARAMETER LIST: " << endl;
-	for (int x = 0; x < parameters.size(); x++) {
-		cout << parameters[x] << endl;
+	for (int x = 0; x < parameters_.size(); x++) {
+		parameters[x].first = parameters_[x];
 	}
 }
 
 void UserFunction::setParameters(string s) {
-	parameters.push_back(s);
-	cout << "THE PARAMETER LIST: " << endl;
-	cout << parameters[0] << endl;
+	parameters[0].first = s;
+}
+
+void UserFunction::setArguments(vector<double> arguments_) {
+	for (int x = 0; x < arguments_.size(); x++) {
+		parameters[x].second = arguments_[x];
+	}
 }
 
 double UserFunction::call(/*vector<double> parameters, ofstream& outputFile*/) {

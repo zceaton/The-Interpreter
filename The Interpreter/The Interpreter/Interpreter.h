@@ -40,10 +40,11 @@ public:
 		NOT_OPERATOR
 	};
 	void interpretScript(ifstream&, ofstream&);
-	int getSymbolIndex(string line);
 	double computeInfix(string); // separate function for computing infix notation
 	vector<string> infixToPostfix(string infixExpression);
 	string correctSpacing(string original);
+	void interpretLine(string s, ifstream & inputFile, ofstream & outputFile);
+	void interpretLine(string s, ofstream & outputFile);
 	/*CHAR_TYPE getCharType(string s);
 	OPERATOR_TYPE getOperatorType(string s);*/
 };

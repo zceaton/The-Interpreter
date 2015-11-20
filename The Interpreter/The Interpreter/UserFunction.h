@@ -11,13 +11,13 @@ using namespace std;
 class UserFunction {
 
 private:
-    vector<string> definition, parameters;
+	vector<string> definition, parameters;
 
 public:
 	void setDefinition(vector<string>);
 	void setParameters(vector<string>);
 	void setParameters(string);
-    double call(/*vector<double> parameters*/);
+	double call(/*vector<double> parameters*/);
 
 };
 

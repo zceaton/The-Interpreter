@@ -28,8 +28,8 @@ void UserFunction::setParameters(string s) {
 	cout << parameters[0] << endl;
 }
 
-double UserFunction::call(/*vector<double> parameters*/ofstream& outputFile) {
-	int d = 0;
+double UserFunction::call(/*vector<double> parameters, ofstream& outputFile*/) {
+	/*int d = 0;
 	cout << "CALLED" << endl;
 	for (int x = 0; x < definition.size(); x++) {
 		string toPrint = "";
@@ -60,6 +60,14 @@ double UserFunction::call(/*vector<double> parameters*/ofstream& outputFile) {
 
 			break;
 		}
-	}
-	return 0.0;
+	}*/
+	return returnValue;
+}
+
+void UserFunction::setReturnValue(double d){
+	returnValue = d;
+}
+
+double UserFunction::getReturnValue(){
+	return returnValue;
 }

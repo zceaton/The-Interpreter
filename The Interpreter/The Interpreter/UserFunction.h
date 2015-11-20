@@ -21,6 +21,9 @@ public:
 	void setParameters(string);
 	double call(ofstream & outputFile);
 	double call(/*vector<double> parameters*/);
+	void setReturnValue(double);
+	double getReturnValue();
+	int returnValue;
 };
 
 #endif //CSE250_FALL2015_USERFUNCTION_H

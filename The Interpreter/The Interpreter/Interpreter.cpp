@@ -3,7 +3,7 @@
 
 string lineFromFile, temp = "", rightSide = "", left = "";
 int lineNumber = 0, space, leftParenth, d;
-vector<string> tokenizedLine, splitLine, definition;
+vector<string> tokenizedLine, splitLine, definition, tokenizedLine1;
 string variableName, toPrint, functionName, parameterList;
 double variableValue;
 
@@ -278,7 +278,21 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 		break;
 	case(DEFINE_VAR) :
 		if (tokenizedLine.size() == 4) {
-			variableMap[tokenizedLine[1]] = stod(tokenizedLine[3]);
+			try {
+				variableMap[tokenizedLine[1]] = stod(tokenizedLine[3]);
+			}
+			catch (invalid_argument& e) {
+				for (int x = 0; x < tokenizedLine[3].length(); x++) {
+					if (tokenizedLine[3][x] != '(' && tokenizedLine[3][x] != ')') {
+						functionName += tokenizedLine[3][x];
+					}
+				}
+				for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {
+					evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile, functionName);
+				}
+				cout << "THE VARIABLE BEING ACCESSED IS: " << tokenizedLine[1] << endl;
+				variableMap[tokenizedLine[1]] = functionMap[functionName].getReturnValue();
+			}
 		}
 		else {
 			splitLine = tokenize(lineFromFile, "=");
@@ -302,7 +316,7 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 			cout << "Function being called: " << functionName << endl;
 			//functionMap[functionName].call(outputFile);
 			for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {
-				evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile);
+				evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile, functionName);
 			}
 		}
 		break;
@@ -377,12 +391,12 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 	}
 }
 
-double Interpreter::evaluateFunction(string s, ofstream& outputFile) {
-	string line = s;
+double Interpreter::evaluateFunction(string s, ofstream& outputFile, string functionName) {
+	string line = s, fn = functionName;
 	toPrint = "";
 	d = line.find_first_not_of(' ');
 	line = line.substr(d);
-	tokenizedLine = tokenize(line, " ");
+	tokenizedLine1 = tokenize(line, " ");
 	cout << "The line type is: " << getLineType(line) << endl;
 
 	switch (getLineType(line)) {
@@ -391,17 +405,14 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile) {
 		break;
 
 	case(DEFINE_VAR) :
-		if (tokenizedLine.size() == 4) {
-			cout << "CASE A:" << endl;
-			variableMap[tokenizedLine[1]] = stod(tokenizedLine[3]);
+		if (tokenizedLine1.size() == 4) {
+			variableMap[tokenizedLine1[1]] = stod(tokenizedLine1[3]);
 		}
 		else {
-			cout << "CASE B:" << endl;
 			splitLine = tokenize(lineFromFile, "=");
 			rightSide = splitLine[1];
-			variableMap[tokenizedLine[1]] = computeInfix(rightSide);
+			variableMap[tokenizedLine1[1]] = computeInfix(rightSide);
 		}
-		cout << "THE VARIABLE WAS INSERTED. ITS VALUE IS: " << variableMap[tokenizedLine[1]] << endl;
 		break;
 
 	case(DOC_WRITE) :
@@ -421,6 +432,11 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile) {
 			outputFile << variableMap[toPrint];
 		}
 
+		break;
+
+	case(RETURN) :
+		cout << "THE FUNCTION IS: " << fn << ", THE VARIABLE IS: " << tokenizedLine1[1] << ", ITS VALUE IS: " << variableMap[tokenizedLine1[1]] << endl;
+		functionMap[fn].setReturnValue(variableMap[tokenizedLine1[1]]);
 		break;
 	}
 }

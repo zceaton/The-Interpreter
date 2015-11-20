@@ -1,9 +1,9 @@
 #include "Interpreter.h"
 #include <stack>
 
-string lineFromFile, temp = "", rightSide = "", left = "";
+string lineFromFile, temp = "", rightSide = "", left = "", rightSide1 = "";
 int lineNumber = 0, space, leftParenth, d;
-vector<string> tokenizedLine, splitLine, definition, tokenizedLine1;
+vector<string> tokenizedLine, splitLine, definition, tokenizedLine1, splitLine1;
 string variableName, toPrint, functionName, parameterList;
 double variableValue;
 
@@ -409,10 +409,22 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 			variableMap[tokenizedLine1[1]] = stod(tokenizedLine1[3]);
 		}
 		else {
-			splitLine = tokenize(lineFromFile, "=");
-			rightSide = splitLine[1];
-			variableMap[tokenizedLine1[1]] = computeInfix(rightSide);
+			splitLine1 = tokenize(lineFromFile, "=");
+			rightSide1 = splitLine1[1];
+			variableMap[tokenizedLine1[1]] = computeInfix(rightSide1);
 		}
+		break;
+
+	case(USER_DEFINED) :
+			splitLine1 = tokenize(line, "=");
+			rightSide1 = splitLine1[1];
+			if (rightSide1[0] == ' ') { rightSide1 = rightSide1.substr(1); }
+			cout << "THE LEFT SIDE: " << tokenizedLine1[0] << endl;
+			cout << "THE RIGHT SIDE: " << rightSide1 << endl;
+			cout << "THE RESULT OF RIGHT SIDE CALCULATION: " << computeInfix(rightSide1) << endl;
+			variableMap[tokenizedLine1[0]] = computeInfix(rightSide1);
+			cout << "THE VALUE OF THE LEFT SIDE: " << variableMap[tokenizedLine1[0]] << endl;
+
 		break;
 
 	case(DOC_WRITE) :

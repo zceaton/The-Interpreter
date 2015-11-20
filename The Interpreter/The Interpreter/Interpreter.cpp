@@ -300,7 +300,7 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 			}
 
 			cout << "Function being called: " << functionName << endl;
-			functionMap[functionName].call();
+			functionMap[functionName].call(outputFile);
 		}
 		break;
 

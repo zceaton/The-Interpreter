@@ -265,9 +265,9 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 	parameterList = "";
 	LINE_TYPE lineType = getLineType(lineFromFile); // Check Parser.h for the different line types
 	cout << "line " << lineNumber << " is type: " << lineType << endl;
-	cout << lineFromFile << " | ";
+	/*cout << lineFromFile << " | ";
 	lineFromFile = correctSpacing(lineFromFile);
-	cout << lineFromFile << endl;
+	cout << lineFromFile << endl;*/
 	tokenizedLine = tokenize(lineFromFile, " ");
 	UserFunction uf;
 	// Use your interpreter to execute each line
@@ -289,21 +289,24 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 					functionName += tokenizedLine[3][x];
 				}
 				cout << "FUNCTION NAME: " << functionName << endl;
-				for (int x = tokenizedLine[3].find_first_of('(') + 1; tokenizedLine[3][x] != ')'; x++) {
+				for (int x = tokenizedLine[3].find_first_of('(') + 1; tokenizedLine[3][x] != ')'; x++) {//get the arguments in a string
 					argumentList += tokenizedLine[3][x];
 				}
-				cout << "2" << endl;
-				argumentListV = tokenize(argumentList, ",");
 
-				cout << "3" << endl;
+				argumentListV = tokenize(argumentList, ",");//puts the arguments in a vector
 
 				functionParameterList = functionMap[functionName].getParameters();
 
 				for (int x = 0; x < argumentListV.size(); x++) {
-					variableMap[functionParameterList[x]] = variableMap[argumentListV[x]];
+					cout << "Parameter: " << functionParameterList[x] << endl;
+					cout << "Argument: " << argumentListV[x] << endl;
+					variableMap[functionParameterList[x]] = variableMap[argumentListV[x]];//inserts values of parameters/arguments in the variable map
 				}
 
+				cout << "Function being called: " << functionName << endl;
+
 				for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {//evaluates the lines of the function
+					cout << functionMap[functionName].getDefinition()[x] << endl;
 					evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile, functionName);
 				}
 
@@ -330,8 +333,8 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 			}
 
 			cout << "Function being called: " << functionName << endl;
-			//functionMap[functionName].call(outputFile);
 			for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {
+				cout << "THE DEFINITION BEING CALLED: " << functionMap[functionName].getDefinition()[x] << endl;
 				evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile, functionName);
 			}
 		}
@@ -372,6 +375,11 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 
 		uf.setParameters(tokenize(parameterList, ","));
 
+		cout << "PARAMETER LIST VECTOR: " << endl;
+		for (int x = 0; x < uf.getParameters().size(); x++) {
+			cout << tokenize(parameterList, ",")[x] << endl;
+		}
+
 		getline(inputFile, lineFromFile);
 		while (getLineType(lineFromFile) != END_BLOCK) {
 			definition.push_back(lineFromFile);
@@ -408,7 +416,7 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 	line = line.substr(d);
 	line = correctSpacing(line);
 	tokenizedLine1 = tokenize(line, " ");
-	cout << "The line type is: " << getLineType(line) << endl;
+	cout << "Part of a method definition.  " << "The line type is: " << getLineType(line) << endl;
 
 	switch (getLineType(line)) {
 	case(BLANK_LINE) :
@@ -420,16 +428,16 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 			variableMap[tokenizedLine1[1]] = stod(tokenizedLine1[3]);
 		}
 		else {
-			splitLine1 = tokenize(lineFromFile, "=");
+			splitLine1 = tokenize(line, "=");
+			cout << splitLine1[1] << endl;
 			rightSide1 = splitLine1[1];
-			if (rightSide1[0] = ' '){
+			if (rightSide1[0] = ' ') {
 				rightSide1 = rightSide1.substr(1);
 			}
 
 			testName = rightSide1.substr(0, rightSide1.find_first_of('('));
 
 			if (functionMap.find(testName) != functionMap.end()) {
-
 			}
 			else {
 				variableMap[tokenizedLine1[1]] = computeInfix(rightSide1);
@@ -438,14 +446,19 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 		break;
 
 	case(USER_DEFINED) :
+		cout << "IS WE IN HERE?" << endl;
 		if (lineFromFile.find_first_of('=') != -1) {
 			splitLine1 = tokenize(line, "=");
 			rightSide1 = splitLine1[1];
 			if (rightSide1[0] == ' ') { rightSide1 = rightSide1.substr(1); }
 			variableMap[tokenizedLine1[0]] = computeInfix(rightSide1);
 		}
+		else if (lineFromFile.find_first_of('(') != -1) {
+			lineFromFile = lineFromFile.substr(0, lineFromFile.find_first_of('('));
+			cout << "LINEFROMFILE: " << lineFromFile << endl;
+		}
 
-					   break;
+		break;
 
 	case(DOC_WRITE) :
 		if (line[15] == '"') {

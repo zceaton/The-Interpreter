@@ -15,9 +15,7 @@ vector<string> UserFunction::getDefinition() {
 }
 
 void UserFunction::setParameters(vector<string> parameters_) {
-	for (int x = 0; x < parameters_.size(); x++) {
-		parameters.push_back(parameters_[0]);
-	}
+	parameters = parameters_;
 }
 
 void UserFunction::setParameters(string s) {

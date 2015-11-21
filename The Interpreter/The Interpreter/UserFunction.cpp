@@ -16,8 +16,8 @@ vector<string> UserFunction::getDefinition() {
 
 void UserFunction::setParameters(vector<string> parameters_) {
 	for (int x = 0; x < parameters_.size(); x++) {
-			parameters.push_back(parameters_[0]);
-		}
+		parameters.push_back(parameters_[0]);
+	}
 }
 
 void UserFunction::setParameters(string s) {
@@ -28,10 +28,10 @@ vector<string> UserFunction::getParameters() {
 	return parameters;
 }
 
-void UserFunction::setReturnValue(double d){
+void UserFunction::setReturnValue(double d) {
 	returnValue = d;
 }
 
-double UserFunction::getReturnValue(){
+double UserFunction::getReturnValue() {
 	return returnValue;
 }

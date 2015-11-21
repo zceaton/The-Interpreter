@@ -4,7 +4,7 @@
 string lineFromFile, temp = "", rightSide = "", left = "", rightSide1 = "";
 int lineNumber = 0, space, leftParenth, d;
 vector<string> tokenizedLine, splitLine, definition, tokenizedLine1, splitLine1, argumentListV, functionParameterList;
-string variableName, toPrint, functionName, parameterList, argumentList;
+string variableName, toPrint, functionName, parameterList, argumentList, testName;
 double variableValue;
 
 void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
@@ -422,7 +422,18 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 		else {
 			splitLine1 = tokenize(lineFromFile, "=");
 			rightSide1 = splitLine1[1];
-			variableMap[tokenizedLine1[1]] = computeInfix(rightSide1);
+			if (rightSide1[0] = ' '){
+				rightSide1 = rightSide1.substr(1);
+			}
+
+			testName = rightSide1.substr(0, rightSide1.find_first_of('('));
+
+			if (functionMap.find(testName) != functionMap.end()) {
+
+			}
+			else {
+				variableMap[tokenizedLine1[1]] = computeInfix(rightSide1);
+			}
 		}
 		break;
 

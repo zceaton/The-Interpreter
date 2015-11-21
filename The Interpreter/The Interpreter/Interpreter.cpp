@@ -3,8 +3,8 @@
 
 string lineFromFile, temp = "", rightSide = "", left = "", rightSide1 = "";
 int lineNumber = 0, space, leftParenth, d;
-vector<string> tokenizedLine, splitLine, definition, tokenizedLine1, splitLine1;
-string variableName, toPrint, functionName, parameterList;
+vector<string> tokenizedLine, splitLine, definition, tokenizedLine1, splitLine1, argumentListV, functionParameterList;
+string variableName, toPrint, functionName, parameterList, argumentList;
 double variableValue;
 
 void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
@@ -277,20 +277,36 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 		//do nothing for blank line
 		break;
 	case(DEFINE_VAR) :
-		if (tokenizedLine.size() == 4) {
+		if (tokenizedLine.size() == 4 && variableMap.find(tokenizedLine[3]) == variableMap.end()) {//if it's a single number, or method call
 			try {
-				variableMap[tokenizedLine[1]] = stod(tokenizedLine[3]);
+				variableMap[tokenizedLine[1]] = stod(tokenizedLine[3]);//try to get the value if it's a number
 			}
-			catch (invalid_argument& e) {
-				for (int x = 0; x < tokenizedLine[3].length(); x++) {
-					if (tokenizedLine[3][x] != '(' && tokenizedLine[3][x] != ')') {
-						functionName += tokenizedLine[3][x];
+			catch (invalid_argument& e) {//if not catch the exception
+				for (int x = 0; x < tokenizedLine[3].length(); x++) {//gets the function name
+					if (tokenizedLine[3][x] == '(') {
+						break;
 					}
+					functionName += tokenizedLine[3][x];
 				}
-				for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {
+				cout << "FUNCTION NAME: " << functionName << endl;
+				for (int x = tokenizedLine[3].find_first_of('(') + 1; tokenizedLine[3][x] != ')'; x++) {
+					argumentList += tokenizedLine[3][x];
+				}
+				cout << "2" << endl;
+				argumentListV = tokenize(argumentList, ",");
+
+				cout << "3" << endl;
+
+				functionParameterList = functionMap[functionName].getParameters();
+
+				for (int x = 0; x < argumentListV.size(); x++) {
+					variableMap[functionParameterList[x]] = variableMap[argumentListV[x]];
+				}
+
+				for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {//evaluates the lines of the function
 					evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile, functionName);
 				}
-				cout << "THE VARIABLE BEING ACCESSED IS: " << tokenizedLine[1] << endl;
+
 				variableMap[tokenizedLine[1]] = functionMap[functionName].getReturnValue();
 			}
 		}
@@ -323,7 +339,7 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 
 	case(DOC_WRITE) :
 		if (lineFromFile[15] == '"') {
-			for (int x = 16; x < lineFromFile.length() - 2; x++) {
+			for (int x = 16; x < lineFromFile.length() - 3; x++) {
 				toPrint += lineFromFile[x];
 			}
 			outputFile << toPrint;
@@ -334,7 +350,6 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 				toPrint += lineFromFile[x];
 				x++;
 			}
-			cout << toPrint << endl;
 			outputFile << variableMap[toPrint];
 		}
 
@@ -355,12 +370,7 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 		}
 		cout << "PARAMETER LIST STRING: " << parameterList << endl;
 
-		if (parameterList.find_first_of(',') == -1) {
-			uf.setParameters(parameterList);
-		}
-		else {
-			uf.setParameters(tokenize(parameterList, ","));
-		}
+		uf.setParameters(tokenize(parameterList, ","));
 
 		getline(inputFile, lineFromFile);
 		while (getLineType(lineFromFile) != END_BLOCK) {
@@ -396,6 +406,7 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 	toPrint = "";
 	d = line.find_first_not_of(' ');
 	line = line.substr(d);
+	line = correctSpacing(line);
 	tokenizedLine1 = tokenize(line, " ");
 	cout << "The line type is: " << getLineType(line) << endl;
 

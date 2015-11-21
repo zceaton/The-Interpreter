@@ -16,31 +16,15 @@ vector<string> UserFunction::getDefinition() {
 
 void UserFunction::setParameters(vector<string> parameters_) {
 	for (int x = 0; x < parameters_.size(); x++) {
-		parameters[x] = parameters_[x];
-	}
+			parameters.push_back(parameters_[0]);
+		}
 }
 
 void UserFunction::setParameters(string s) {
 	parameters[0] = s;
 }
 
-void UserFunction::setArguments(vector<string> arguments_) {
-	for (int x = 0; x < arguments_.size(); x++) {
-		arguments[x].first = arguments_[x];
-	}
-}
-
-void UserFunction::setArguments(vector<double> arguments_) {
-	for (int x = 0; x < arguments_.size(); x++) {
-		arguments[x].second = arguments_[x];
-	}
-}
-
-map<int, pair<string, double>> UserFunction::getArguments() {
-	return arguments;
-}
-
-map<int, string> UserFunction::getParameters() {
+vector<string> UserFunction::getParameters() {
 	return parameters;
 }
 

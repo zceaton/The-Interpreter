@@ -263,15 +263,14 @@ string Interpreter::correctSpacing(string original) {
 }
 
 void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputFile) {
-	lineNumber++;
-	toPrint = "";
-	functionName = "";
-	parameterList = "";
+	lineNumber++, toPrint = "", functionName = "", parameterList = "", argumentList = "";
 	LINE_TYPE lineType = getLineType(lineFromFile); // Check Parser.h for the different line types
-	std::cout << "line " << lineNumber << " is type: " << lineType << endl;
-	std::cout << lineFromFile << " | ";
+	if (lineType != 0) {
+		std::cout << "line \"" << lineFromFile << "\" is type: " << lineType << endl;
+	}
+	//std::cout << lineFromFile << " | ";
 	lineFromFile = correctSpacing(lineFromFile);
-	std::cout << lineFromFile << endl;
+	//std::cout << lineFromFile << endl;
 	tokenizedLine = tokenize(lineFromFile, " ");
 	UserFunction uf;
 	// Use your interpreter to execute each line
@@ -281,10 +280,6 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 		//do nothing for blank line
 		break;
 	case(DEFINE_VAR) :
-		for (int x = 0; x < tokenizedLine.size(); x++) {
-			std::cout << "TL[" << x << "]: " << tokenizedLine[x] << endl;
-		}
-
 		if (tokenizedLine.size() == 4 && variableMap.find(tokenizedLine[3]) == variableMap.end()) {//if it's a single number, or method call
 			try {
 				variableMap[tokenizedLine[1]] = stod(tokenizedLine[3]);//try to get the value if it's a number
@@ -306,15 +301,14 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 				functionParameterList = functionMap[functionName].getParameters();
 
 				for (int x = 0; x < argumentListV.size(); x++) {
-					std::cout << "Parameter: " << functionParameterList[x] << endl;
-					std::cout << "Argument: " << argumentListV[x] << endl;
+					//std::cout << "Parameter: " << functionParameterList[x] << endl;
+					//std::cout << "Argument: " << argumentListV[x] << endl;
 					variableMap[functionParameterList[x]] = variableMap[argumentListV[x]];//inserts values of parameters/arguments in the variable map
 				}
 
 				std::cout << "Function being called: " << functionName << endl;
 
 				for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {//evaluates the lines of the function
-					std::cout << functionMap[functionName].getDefinition()[x] << endl;
 					evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile, functionName);
 				}
 
@@ -340,9 +334,19 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 				functionName += lineFromFile[x];
 			}
 
-			std::cout << "Function being called: " << functionName << endl;
+			for (int x = lineFromFile.find_first_of('(') + 1; lineFromFile[x] != ')'; x++) {//get the arguments in a string
+				argumentList += lineFromFile[x];
+			}
+			cout << "ARGUMENTLIST: " << argumentList << endl;
+
+			argumentListV = tokenize(argumentList, ",");
+			functionParameterList = functionMap[functionName].getParameters();
+
+			for (int x = 0; x < argumentListV.size(); x++) {
+				variableMap[functionParameterList[x]] = variableMap[argumentListV[x]];//inserts values of parameters/arguments in the variable map
+			}
+
 			for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {
-				std::cout << "THE DEFINITION BEING CALLED: " << functionMap[functionName].getDefinition()[x] << endl;
 				evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile, functionName);
 			}
 		}
@@ -364,7 +368,7 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 			outputFile << variableMap[toPrint];
 		}
 
-		std::cout << "DONE WITH THIS LINE" << endl;
+		//std::cout << "DONE WITH THIS LINE" << endl;
 		break;
 
 	case(FUNCTION_DEF) :
@@ -375,7 +379,7 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 		for (int x = space + 1; lineFromFile[x] != '('; x++) {
 			functionName += lineFromFile[x];
 		}
-		std::cout << "THE FUNCTION NAME IS: " << functionName << endl;
+		//std::cout << "THE FUNCTION NAME IS: " << functionName << endl;
 
 		for (int x = leftParenth + 1; lineFromFile[x] != ')'; x++) {
 			parameterList += lineFromFile[x];
@@ -385,13 +389,14 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 
 		std::getline(inputFile, lineFromFile);
 		while (getLineType(lineFromFile) != END_BLOCK) {
-			definition.push_back(lineFromFile);
+			definition.push_back(lineFromFile.substr(lineFromFile.find_first_not_of(" ")));
 			std::getline(inputFile, lineFromFile);
 		}
 
 		uf.setDefinition(definition);
 
 		functionMap[functionName] = uf;
+		definition.clear();
 		break;
 
 	case(RETURN) :
@@ -419,7 +424,7 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 	line = line.substr(d);
 	line = correctSpacing(line);
 	tokenizedLine1 = tokenize(line, " ");
-	std::cout << "Part of a method definition.  " << "The line type is: " << getLineType(line) << endl;
+	std::cout << "Part of a method definition:  " << line << " | The line type is: " << getLineType(line) << endl;
 
 	switch (getLineType(line)) {
 	case(BLANK_LINE) :
@@ -432,7 +437,7 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 		}
 		else {
 			splitLine1 = tokenize(line, "=");
-			std::cout << splitLine1[1] << endl;
+			//std::cout << splitLine1[1] << endl;
 			rightSide1 = splitLine1[1];
 			if (rightSide1[0] = ' ') {
 				rightSide1 = rightSide1.substr(1);
@@ -449,16 +454,17 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 		break;
 
 	case(USER_DEFINED) :
-		std::cout << "IS WE IN HERE?" << endl;
-		if (lineFromFile.find_first_of('=') != -1) {
+		if (line.find_first_of('=') != -1) {
 			splitLine1 = tokenize(line, "=");
 			rightSide1 = splitLine1[1];
 			if (rightSide1[0] == ' ') { rightSide1 = rightSide1.substr(1); }
 			variableMap[tokenizedLine1[0]] = computeInfix(rightSide1);
 		}
-		else if (lineFromFile.find_first_of('(') != -1) {
-			lineFromFile = lineFromFile.substr(0, lineFromFile.find_first_of('('));
-			std::cout << "LINEFROMFILE: " << lineFromFile << endl;
+		else if (line.find_first_of('(') != -1) {
+			line = line.substr(0, line.find_first_of('('));
+			for (int x = 0; x < functionMap[line].getDefinition().size(); x++) {
+				evaluateFunction(functionMap[line].getDefinition()[x], outputFile, functionName);
+			}
 		}
 
 		break;
@@ -476,7 +482,7 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 				toPrint += line[x];
 				x++;
 			}
-			std::cout << toPrint << endl;
+			//std::cout << "TOPRINT: " << toPrint << endl;
 			outputFile << variableMap[toPrint];
 		}
 

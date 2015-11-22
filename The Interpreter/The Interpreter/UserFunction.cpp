@@ -4,10 +4,6 @@
 
 void UserFunction::setDefinition(vector<string> definition_) {
 	definition = definition_;
-	cout << "THE DEFINITION:" << endl;
-	for (int x = 0; x < definition.size(); x++) {
-		cout << definition[x] << endl;
-	}
 }
 
 vector<string> UserFunction::getDefinition() {

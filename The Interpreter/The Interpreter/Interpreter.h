@@ -45,6 +45,7 @@ public:
 	string correctSpacing(string original);
 	void interpretLine(string s, ifstream & inputFile, ofstream & outputFile);
 	double evaluateFunction(string s, ofstream & outputFile, string functionName);
+	bool evaluateConditional(string conditional);
 	void addArguments(UserFunction f);
 	double evaluateFunction(string line, ofstream & outputFile);
 	/*CHAR_TYPE getCharType(string s);

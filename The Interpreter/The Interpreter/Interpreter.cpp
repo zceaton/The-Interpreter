@@ -3,12 +3,12 @@
 
 string lineFromFile, temp = "", rightSide = "", left = "", rightSide1 = "";
 int lineNumber = 0, space, leftParenth, d;
-vector<string> tokenizedLine, splitLine, definition, tokenizedLine1, splitLine1, argumentListV, functionParameterList;
-string variableName, toPrint, functionName, parameterList, argumentList, testName;
+vector<string> tokenizedLine, splitLine, definition, tokenizedLine1, splitLine1, argumentListV, functionParameterList, splitCondtional;
+string variableName, toPrint, functionName, parameterList, argumentList, testName, conditionalSymbol;
 double variableValue;
 
 void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
-	while (getline(inputFile, lineFromFile)) {
+	while (std::getline(inputFile, lineFromFile)) {
 		interpretLine(lineFromFile, inputFile, outputFile);
 	}
 	// write the result from the return statement of the program into the output file
@@ -42,21 +42,21 @@ double Interpreter::computeInfix(string infixExpression) {
 	stack<double> calcStack;
 	double temp1, temp2;
 
-	/*cout << infixExpression << endl;
+	/*std::cout << infixExpression << endl;
 	for (int x = 0; x < postfixExpression.size(); x++) {
-	cout << postfixExpression[x] << " ";
+	std::cout << postfixExpression[x] << " ";
 	}
-	cout << endl;*/
+	std::cout << endl;*/
 
 	for (int x = 0; x < postfixExpression.size(); x++) {
 		if (getOperatorType(postfixExpression[x]) == NOT_OPERATOR) {
 			if (getCharType(postfixExpression[x]) == DIGIT) {
 				calcStack.push(stod(postfixExpression[x]));
-				//cout << "DIGIT: " << postfixExpression[x] << endl;
+				//std::cout << "DIGIT: " << postfixExpression[x] << endl;
 			}
 			else if (getCharType(postfixExpression[x]) == VARIABLE) {
 				calcStack.push(variableMap[postfixExpression[x]]);
-				//cout << "VARIABLE: " << postfixExpression[x] << " = " << variableMap[postfixExpression[x]] <<  endl;
+				//std::cout << "VARIABLE: " << postfixExpression[x] << " = " << variableMap[postfixExpression[x]] <<  endl;
 			}
 		}
 
@@ -65,27 +65,27 @@ double Interpreter::computeInfix(string infixExpression) {
 			calcStack.pop();
 			temp2 = calcStack.top();
 			calcStack.pop();
-			//cout << temp1 << "|" << temp2 << endl;
+			//std::cout << temp1 << "|" << temp2 << endl;
 
 			switch (getOperatorType((postfixExpression[x]))) {
 			case (MULTIPLICATION) :
 				calcStack.push(temp2 * temp1);
-				//cout << "MULTIPLICATION" << endl;
+				//std::cout << "MULTIPLICATION" << endl;
 				break;
 
 			case(ADDITION) :
 				calcStack.push(temp2 + temp1);
-				//cout << "ADDITION" << endl;
+				//std::cout << "ADDITION" << endl;
 				break;
 
 			case(DIVISION) :
 				calcStack.push(temp2 / temp1);
-				//cout << "DIVISION" << endl;
+				//std::cout << "DIVISION" << endl;
 				break;
 
 			case(SUBTRACTION) :
 				calcStack.push(temp2 - temp1);
-				//cout << "SUBTRACTION" << endl;
+				//std::cout << "SUBTRACTION" << endl;
 				break;
 			}
 		}
@@ -235,7 +235,11 @@ string Interpreter::correctSpacing(string original) {
 	for (int x = 0; x < a.length(); x++) {
 		s = "";
 		s += a[x];
-		if (getOperatorType(s) == DIVISION) {
+		if (s == "," && a[x + 1] == ' ') {
+			corrected += a[x];
+			x++;
+		}
+		else if (getOperatorType(s) == DIVISION) {
 			if (a[x - 1] != ' ' && a[x - 1] != 'r') {
 				corrected += " ";
 			}
@@ -264,10 +268,10 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 	functionName = "";
 	parameterList = "";
 	LINE_TYPE lineType = getLineType(lineFromFile); // Check Parser.h for the different line types
-	cout << "line " << lineNumber << " is type: " << lineType << endl;
-	/*cout << lineFromFile << " | ";
+	std::cout << "line " << lineNumber << " is type: " << lineType << endl;
+	std::cout << lineFromFile << " | ";
 	lineFromFile = correctSpacing(lineFromFile);
-	cout << lineFromFile << endl;*/
+	std::cout << lineFromFile << endl;
 	tokenizedLine = tokenize(lineFromFile, " ");
 	UserFunction uf;
 	// Use your interpreter to execute each line
@@ -277,6 +281,10 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 		//do nothing for blank line
 		break;
 	case(DEFINE_VAR) :
+		for (int x = 0; x < tokenizedLine.size(); x++) {
+			std::cout << "TL[" << x << "]: " << tokenizedLine[x] << endl;
+		}
+
 		if (tokenizedLine.size() == 4 && variableMap.find(tokenizedLine[3]) == variableMap.end()) {//if it's a single number, or method call
 			try {
 				variableMap[tokenizedLine[1]] = stod(tokenizedLine[3]);//try to get the value if it's a number
@@ -288,7 +296,7 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 					}
 					functionName += tokenizedLine[3][x];
 				}
-				cout << "FUNCTION NAME: " << functionName << endl;
+				std::cout << "FUNCTION NAME: " << functionName << endl;
 				for (int x = tokenizedLine[3].find_first_of('(') + 1; tokenizedLine[3][x] != ')'; x++) {//get the arguments in a string
 					argumentList += tokenizedLine[3][x];
 				}
@@ -298,15 +306,15 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 				functionParameterList = functionMap[functionName].getParameters();
 
 				for (int x = 0; x < argumentListV.size(); x++) {
-					cout << "Parameter: " << functionParameterList[x] << endl;
-					cout << "Argument: " << argumentListV[x] << endl;
+					std::cout << "Parameter: " << functionParameterList[x] << endl;
+					std::cout << "Argument: " << argumentListV[x] << endl;
 					variableMap[functionParameterList[x]] = variableMap[argumentListV[x]];//inserts values of parameters/arguments in the variable map
 				}
 
-				cout << "Function being called: " << functionName << endl;
+				std::cout << "Function being called: " << functionName << endl;
 
 				for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {//evaluates the lines of the function
-					cout << functionMap[functionName].getDefinition()[x] << endl;
+					std::cout << functionMap[functionName].getDefinition()[x] << endl;
 					evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile, functionName);
 				}
 
@@ -332,9 +340,9 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 				functionName += lineFromFile[x];
 			}
 
-			cout << "Function being called: " << functionName << endl;
+			std::cout << "Function being called: " << functionName << endl;
 			for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {
-				cout << "THE DEFINITION BEING CALLED: " << functionMap[functionName].getDefinition()[x] << endl;
+				std::cout << "THE DEFINITION BEING CALLED: " << functionMap[functionName].getDefinition()[x] << endl;
 				evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile, functionName);
 			}
 		}
@@ -356,6 +364,7 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 			outputFile << variableMap[toPrint];
 		}
 
+		std::cout << "DONE WITH THIS LINE" << endl;
 		break;
 
 	case(FUNCTION_DEF) :
@@ -366,24 +375,18 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 		for (int x = space + 1; lineFromFile[x] != '('; x++) {
 			functionName += lineFromFile[x];
 		}
-		cout << "THE FUNCTION NAME IS: " << functionName << endl;
+		std::cout << "THE FUNCTION NAME IS: " << functionName << endl;
 
 		for (int x = leftParenth + 1; lineFromFile[x] != ')'; x++) {
 			parameterList += lineFromFile[x];
 		}
-		cout << "PARAMETER LIST STRING: " << parameterList << endl;
 
 		uf.setParameters(tokenize(parameterList, ","));
 
-		cout << "PARAMETER LIST VECTOR: " << endl;
-		for (int x = 0; x < uf.getParameters().size(); x++) {
-			cout << tokenize(parameterList, ",")[x] << endl;
-		}
-
-		getline(inputFile, lineFromFile);
+		std::getline(inputFile, lineFromFile);
 		while (getLineType(lineFromFile) != END_BLOCK) {
 			definition.push_back(lineFromFile);
-			getline(inputFile, lineFromFile);
+			std::getline(inputFile, lineFromFile);
 		}
 
 		uf.setDefinition(definition);
@@ -416,7 +419,7 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 	line = line.substr(d);
 	line = correctSpacing(line);
 	tokenizedLine1 = tokenize(line, " ");
-	cout << "Part of a method definition.  " << "The line type is: " << getLineType(line) << endl;
+	std::cout << "Part of a method definition.  " << "The line type is: " << getLineType(line) << endl;
 
 	switch (getLineType(line)) {
 	case(BLANK_LINE) :
@@ -429,7 +432,7 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 		}
 		else {
 			splitLine1 = tokenize(line, "=");
-			cout << splitLine1[1] << endl;
+			std::cout << splitLine1[1] << endl;
 			rightSide1 = splitLine1[1];
 			if (rightSide1[0] = ' ') {
 				rightSide1 = rightSide1.substr(1);
@@ -446,7 +449,7 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 		break;
 
 	case(USER_DEFINED) :
-		cout << "IS WE IN HERE?" << endl;
+		std::cout << "IS WE IN HERE?" << endl;
 		if (lineFromFile.find_first_of('=') != -1) {
 			splitLine1 = tokenize(line, "=");
 			rightSide1 = splitLine1[1];
@@ -455,7 +458,7 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 		}
 		else if (lineFromFile.find_first_of('(') != -1) {
 			lineFromFile = lineFromFile.substr(0, lineFromFile.find_first_of('('));
-			cout << "LINEFROMFILE: " << lineFromFile << endl;
+			std::cout << "LINEFROMFILE: " << lineFromFile << endl;
 		}
 
 		break;
@@ -473,15 +476,33 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 				toPrint += line[x];
 				x++;
 			}
-			cout << toPrint << endl;
+			std::cout << toPrint << endl;
 			outputFile << variableMap[toPrint];
 		}
 
 		break;
 
 	case(RETURN) :
-		cout << "THE FUNCTION IS: " << fn << ", THE VARIABLE IS: " << tokenizedLine1[1] << ", ITS VALUE IS: " << variableMap[tokenizedLine1[1]] << endl;
+		std::cout << "THE FUNCTION IS: " << fn << ", THE VARIABLE IS: " << tokenizedLine1[1] << ", ITS VALUE IS: " << variableMap[tokenizedLine1[1]] << endl;
 		functionMap[fn].setReturnValue(variableMap[tokenizedLine1[1]]);
 		break;
+	}
+}
+
+bool Interpreter::evaluateConditional(string conditional) {
+	if (conditional.find_first_of('<') == -1) {
+		conditionalSymbol = conditional[conditional.find_first_of('>')];
+	}
+	else {
+		conditionalSymbol = conditional[conditional.find_first_of('<')];
+	}
+
+	splitCondtional = tokenize(conditional, conditionalSymbol);
+
+	if (conditionalSymbol == "<") {
+		return variableMap[splitCondtional[0]] < variableMap[splitCondtional[1]];
+	}
+	else {
+		return variableMap[splitCondtional[0]] > variableMap[splitCondtional[1]];
 	}
 }

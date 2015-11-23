@@ -3,9 +3,10 @@
 
 string lineFromFile, temp = "", rightSide = "", left = "", rightSide1 = "";
 int lineNumber = 0, space, leftParenth, d;
-vector<string> tokenizedLine, splitLine, definition, tokenizedLine1, splitLine1, argumentListV, functionParameterList, splitCondtional;
-string variableName, toPrint, functionName, parameterList, argumentList, testName, conditionalSymbol, testName1;
+vector<string> tokenizedLine, splitLine, definition, tokenizedLine1, splitLine1, argumentListV, functionParameterList, splitCondtional, conditionalDefinition;
+string variableName, toPrint, functionName, parameterList, argumentList, testName, conditionalSymbol, testName1, conditionalExpression;
 double variableValue;
+bool evalElse;
 
 void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
 	while (std::getline(inputFile, lineFromFile)) {
@@ -418,6 +419,30 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 		break;
 
 	case(IF) :
+		space = lineFromFile.find_first_of(' ');
+		leftParenth = lineFromFile.find_first_of('(');
+
+		for (int x = leftParenth + 1; lineFromFile[x] != ')'; x++) {
+			conditionalExpression += lineFromFile[x];
+		}
+		cout << "CONDITIONAL EXPRESSION: " << conditionalExpression << endl;
+
+		std::getline(inputFile, lineFromFile);
+		while (getLineType(lineFromFile) != END_BLOCK && getLineType(lineFromFile) != ELSE) {
+			conditionalDefinition.push_back(lineFromFile.substr(lineFromFile.find_first_not_of(" ")));
+			std::getline(inputFile, lineFromFile);
+		}
+
+		evalElse = !evaluateConditional(conditionalExpression);
+
+		if (!evalElse) {
+			for (int x = 0; x < conditionalDefinition.size(); x++) {
+				evaluateFunction(conditionalDefinition[x], outputFile, functionName);
+			}
+		}
+
+		conditionalExpression.clear();
+		conditionalDefinition.clear();
 		break;
 
 	case(ELSE_IF) :

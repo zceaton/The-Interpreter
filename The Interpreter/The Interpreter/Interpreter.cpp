@@ -4,7 +4,7 @@
 string lineFromFile, temp = "", rightSide = "", left = "", rightSide1 = "";
 int lineNumber = 0, space, leftParenth, d;
 vector<string> tokenizedLine, splitLine, definition, tokenizedLine1, splitLine1, argumentListV, functionParameterList, splitCondtional;
-string variableName, toPrint, functionName, parameterList, argumentList, testName, conditionalSymbol;
+string variableName, toPrint, functionName, parameterList, argumentList, testName, conditionalSymbol, testName1;
 double variableValue;
 
 void Interpreter::interpretScript(ifstream& inputFile, ofstream& outputFile) {
@@ -263,7 +263,7 @@ string Interpreter::correctSpacing(string original) {
 }
 
 void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputFile) {
-	lineNumber++, toPrint = "", functionName = "", parameterList = "", argumentList = "";
+	lineNumber++, toPrint = "", functionName = "", parameterList = "", argumentList = "", testName1 = "";
 	LINE_TYPE lineType = getLineType(lineFromFile); // Check Parser.h for the different line types
 	if (lineType != 0) {
 		std::cout << "line \"" << lineFromFile << "\" is type: " << lineType << endl;
@@ -317,40 +317,51 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 		}
 		else {
 			splitLine = tokenize(lineFromFile, "=");
+			//std::cout << splitLine1[1] << endl;
 			rightSide = splitLine[1];
-			variableMap[tokenizedLine[1]] = computeInfix(rightSide);
+			if (rightSide[0] = ' ') {
+				rightSide = rightSide.substr(1);
+			}
+
+			testName1 = rightSide.substr(0, rightSide.find_first_of('('));
+
+			if (functionMap.find(testName1) != functionMap.end()) {
+			}
+			else {
+				variableMap[tokenizedLine[1]] = computeInfix(rightSide);
+			}
 		}
 		break;
 
 	case(USER_DEFINED) :
-		if (lineFromFile.find_first_of('=') != -1) {
-			splitLine = tokenize(lineFromFile, "=");
-			rightSide = splitLine[1];
-			if (rightSide[0] == ' ') { rightSide = rightSide.substr(1); }
-			variableMap[tokenizedLine[0]] = computeInfix(rightSide);
+		for (int x = 0; lineFromFile[x] != '('; x++) {
+			functionName += lineFromFile[x];
 		}
-		else {
-			for (int x = 0; lineFromFile[x] != '('; x++) {
-				functionName += lineFromFile[x];
-			}
 
-			for (int x = lineFromFile.find_first_of('(') + 1; lineFromFile[x] != ')'; x++) {//get the arguments in a string
-				argumentList += lineFromFile[x];
-			}
-			cout << "ARGUMENTLIST: " << argumentList << endl;
+					   if (lineFromFile.find_first_of('=') != -1 && functionMap.find(functionName) != functionMap.end()) {
+						   splitLine = tokenize(lineFromFile, "=");
+						   rightSide = splitLine[1];
+						   if (rightSide[0] == ' ') { rightSide = rightSide.substr(1); }
+						   variableMap[tokenizedLine[0]] = computeInfix(rightSide);
+					   }
+					   else {
+						   for (int x = lineFromFile.find_first_of('(') + 1; lineFromFile[x] != ')'; x++) {//get the arguments in a string
+							   argumentList += lineFromFile[x];
+						   }
+						   cout << "ARGUMENTLIST: " << argumentList << endl;
 
-			argumentListV = tokenize(argumentList, ",");
-			functionParameterList = functionMap[functionName].getParameters();
+						   argumentListV = tokenize(argumentList, ",");
+						   functionParameterList = functionMap[functionName].getParameters();
 
-			for (int x = 0; x < argumentListV.size(); x++) {
-				variableMap[functionParameterList[x]] = variableMap[argumentListV[x]];//inserts values of parameters/arguments in the variable map
-			}
+						   for (int x = 0; x < argumentListV.size(); x++) {
+							   variableMap[functionParameterList[x]] = variableMap[argumentListV[x]];//inserts values of parameters/arguments in the variable map
+						   }
 
-			for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {
-				evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile, functionName);
-			}
-		}
-		break;
+						   for (int x = 0; x < functionMap[functionName].getDefinition().size(); x++) {
+							   evaluateFunction(functionMap[functionName].getDefinition()[x], outputFile, functionName);
+						   }
+					   }
+					   break;
 
 	case(DOC_WRITE) :
 		if (lineFromFile[15] == '"') {
@@ -418,7 +429,8 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 }
 
 double Interpreter::evaluateFunction(string s, ofstream& outputFile, string functionName) {
-	string line = s, fn = functionName;
+	string line = s, fn = functionName, functionName1 = "", argumentList1 = "";
+	vector<string> functionParameterList1, argumentListV1;
 	toPrint = "";
 	d = line.find_first_not_of(' ');
 	line = line.substr(d);
@@ -432,8 +444,36 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 		break;
 
 	case(DEFINE_VAR) :
-		if (tokenizedLine1.size() == 4) {
-			variableMap[tokenizedLine1[1]] = stod(tokenizedLine1[3]);
+		if (tokenizedLine1.size() == 4 && variableMap.find(tokenizedLine1[3]) == variableMap.end()) {
+			try {
+				variableMap[tokenizedLine1[1]] = stod(tokenizedLine1[3]);
+			}
+			catch (invalid_argument& e) {
+				for (int x = 0; x < tokenizedLine1[3].length(); x++) {//gets the function name
+					if (tokenizedLine1[3][x] == '(') {
+						break;
+					}
+					functionName1 += tokenizedLine1[3][x];
+				}
+				for (int x = tokenizedLine1[3].find_first_of('(') + 1; tokenizedLine1[3][x] != ')'; x++) {//get the arguments in a string
+					argumentList1 += tokenizedLine1[3][x];
+				}
+
+				argumentListV1 = tokenize(argumentList1, ",");//puts the arguments in a vector
+				functionParameterList1 = functionMap[functionName1].getParameters();
+
+				for (int x = 0; x < argumentListV1.size(); x++) {
+					//std::cout << "Parameter: " << functionParameterList[x] << endl;
+					//std::cout << "Argument: " << argumentListV[x] << endl;
+					variableMap[functionParameterList1[x]] = variableMap[argumentListV1[x]];//inserts values of parameters/arguments in the variable map
+				}
+
+				for (int x = 0; x < functionMap[functionName1].getDefinition().size(); x++) {//evaluates the lines of the function
+					evaluateFunction(functionMap[functionName1].getDefinition()[x], outputFile, functionName);
+				}
+
+				variableMap[tokenizedLine1[1]] = functionMap[functionName1].getReturnValue();
+			}
 		}
 		else {
 			splitLine1 = tokenize(line, "=");
@@ -454,16 +494,42 @@ double Interpreter::evaluateFunction(string s, ofstream& outputFile, string func
 		break;
 
 	case(USER_DEFINED) :
-		if (line.find_first_of('=') != -1) {
-			splitLine1 = tokenize(line, "=");
-			rightSide1 = splitLine1[1];
-			if (rightSide1[0] == ' ') { rightSide1 = rightSide1.substr(1); }
+		if (line.find_first_of('(') != -1) {
+			if (line.find_first_of('=') != -1) {//get the function name if it's in an equation
+				splitLine1 = tokenize(line, "=");
+				rightSide1 = splitLine1[1];
+				if (rightSide1[0] == ' ') { rightSide1 = rightSide1.substr(1); }
+
+				for (int x = 0; rightSide1[x] != '('; x++) {
+					functionName1 += rightSide1[x];
+				}
+			}
+			else {//get the function name otherwise
+				for (int x = 0; line[x] != '('; x++) {
+					functionName1 += line[x];
+				}
+			}
+		}
+
+		if ((line.find_first_of('=') != -1 && functionMap.find(functionName1) == functionMap.end()) || line.find_first_of('(') == -1) {//if there is no function
 			variableMap[tokenizedLine1[0]] = computeInfix(rightSide1);
 		}
-		else if (line.find_first_of('(') != -1) {
-			line = line.substr(0, line.find_first_of('('));
-			for (int x = 0; x < functionMap[line].getDefinition().size(); x++) {
-				evaluateFunction(functionMap[line].getDefinition()[x], outputFile, functionName);
+
+		else /*if (line.find_first_of('(') != -1)*/ {
+			for (int x = line.find_first_of('(') + 1; line[x] != ')'; x++) {//get the arguments in a string
+				argumentList1 += line[x];
+			}
+			cout << "ARGUMENTLIST: " << argumentList1 << endl;
+
+			argumentListV1 = tokenize(argumentList1, ",");
+			functionParameterList1 = functionMap[functionName1].getParameters();
+
+			for (int x = 0; x < argumentListV1.size(); x++) {
+				variableMap[functionParameterList1[x]] = variableMap[argumentListV1[x]];//inserts values of parameters/arguments in the variable map
+			}
+
+			for (int x = 0; x < functionMap[functionName1].getDefinition().size(); x++) {
+				evaluateFunction(functionMap[functionName1].getDefinition()[x], outputFile, functionName);
 			}
 		}
 

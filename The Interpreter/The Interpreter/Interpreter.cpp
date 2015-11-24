@@ -354,7 +354,7 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 		break;
 
 	case(DOC_WRITE) :
-		if (lineFromFile[lineFromFile.find_first_of('(') +1] == '"') {
+		if (lineFromFile[lineFromFile.find_first_of('(') + 1] == '"') {
 			for (int x = lineFromFile.find_first_of('(') + 2; lineFromFile[x] != '"'; x++) {
 				toPrint += lineFromFile[x];
 			}
@@ -419,26 +419,46 @@ void Interpreter::interpretLine(string s, ifstream& inputFile, ofstream& outputF
 		std::getline(inputFile, lineFromFile);
 		while (getLineType(lineFromFile) != END_BLOCK && getLineType(lineFromFile) != ELSE) {
 			conditionalDefinition.push_back(lineFromFile.substr(lineFromFile.find_first_not_of(" ")));
+			cout << "TEST: " << lineFromFile.substr(lineFromFile.find_first_not_of(" ")) << endl;
 			std::getline(inputFile, lineFromFile);
-		}
+			if (getLineType(lineFromFile) == ELSE) {
+				evalElse = !evaluateConditional(conditionalExpression);
 
-		evalElse = !evaluateConditional(conditionalExpression);
+				if (!evalElse) {
+					for (int x = 0; x < conditionalDefinition.size(); x++) {
+						evaluateFunction(conditionalDefinition[x], outputFile, functionName);
+					}
+				}
 
-		if (!evalElse) {
-			for (int x = 0; x < conditionalDefinition.size(); x++) {
-				evaluateFunction(conditionalDefinition[x], outputFile, functionName);
+				conditionalExpression.clear();
+				conditionalDefinition.clear();
+				interpretLine(lineFromFile, inputFile, outputFile);
 			}
 		}
 
-		conditionalExpression.clear();
-		conditionalDefinition.clear();
 		break;
 
 	case(ELSE_IF) :
 		break;
 
 	case(ELSE) :
-		break;
+		std::getline(inputFile, lineFromFile);
+		while (getLineType(lineFromFile) != END_BLOCK) {
+			cout << "A:  " << lineFromFile.substr(lineFromFile.find_first_not_of(" ")) << endl;
+			conditionalDefinition.push_back(lineFromFile.substr(lineFromFile.find_first_not_of(" ")));
+			std::getline(inputFile, lineFromFile);
+		}
+			   if (evalElse) {
+				   cout << "ARE WE HERE?" << endl;
+				   for (int x = 0; x < conditionalDefinition.size(); x++) {
+					   cout << "DEFINITION: " << conditionalDefinition[x] << endl;
+					   evaluateFunction(conditionalDefinition[x], outputFile, functionName);
+				   }
+			   }
+			   cout << "HERE?" << endl;
+			   conditionalDefinition.clear();
+
+			   break;
 	}
 }
 
